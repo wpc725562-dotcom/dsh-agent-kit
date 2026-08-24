@@ -25,14 +25,20 @@
 git clone https://github.com/<your-name>/dsh-agent-kit.git
 cd dsh-agent-kit
 
-# 2. 一键安装到 DSH
+# 2. 一键安装到 DSH（自动合并 MCP 配置 + 复制 Skills + 安装 Presets）
 powershell -ExecutionPolicy Bypass -File scripts/install.ps1
+# 先预览再安装（不写入任何文件）：
+powershell -ExecutionPolicy Bypass -File scripts/install.ps1 --dry-run
 
 # 3. 校验是否装好
 powershell -File scripts/verify.ps1
 
 # 4. 重启 DSH Desktop，/mcp list 确认 4 个 MCP 均 Active
 ```
+
+> **v2 特性**：install.ps1 会把 `mcp/*.yml` 模板**自动合并**进
+> `cordis.patch.yml`（无需手动复制），并自动安装 Skills 与 Presets，
+> 安装前自动备份（`*.bak-<timestamp>`）可回滚。
 
 ## 目录结构
 
