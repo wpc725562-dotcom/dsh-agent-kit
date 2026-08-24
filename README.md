@@ -48,7 +48,8 @@ dsh-agent-kit/
 │   ├── cloakbrowser.yml
 │   ├── anki.yml
 │   ├── bilibili.yml
-│   └── code-runner.yml
+│   ├── code-runner.yml
+│   └── bili-note.yml        # B站字幕→学习笔记（需先 clone bili-note-mcp）
 ├── skills/                 # 技能定义（每个一个目录 + SKILL.md）
 │   ├── study-coach/
 │   ├── web-research/

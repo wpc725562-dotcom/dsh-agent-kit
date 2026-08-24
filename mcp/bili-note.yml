@@ -1,0 +1,7 @@
+serverName: bili-note
+transport: stdio
+command: 'python'
+args:
+  - 'C:\Users\Administrator\Desktop\deeepseek\bili-note-mcp\server.py'
+toolCallTimeoutMs: 120000
+failOnStartupError: false
