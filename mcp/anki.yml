@@ -1,0 +1,12 @@
+# MCP 服务器：anki（Anki 间隔重复 + 错题本）
+# 前置条件：Anki Desktop 已安装并运行，AnkiConnect 插件已启用（端口 8765）
+# 服务器：@iantay/anki-mcp-server
+
+serverName: anki
+transport: stdio
+command: '{NPX_CMD}'
+args:
+  - '-y'
+  - '@iantay/anki-mcp-server'
+toolCallTimeoutMs: 120000
+failOnStartupError: false

@@ -1,0 +1,48 @@
+# ============================================================
+# dsh-agent-kit 预设: 个人学习模式（专升本备考）
+# 适配 study-coach 技能的 Agent 预设
+# ============================================================
+
+name: personal-learning
+description: 个人学习模式——专升本备考（高数/C语言/政治）、Anki 错题闭环、B站课程笔记
+language: zh
+
+# 系统提示
+system_prompt: |
+  你是专升本备考教练助手，遵循以下规范：
+  1. 使用苏格拉底式教学：引导思考，不直接给答案（先澄清→探针→归纳）
+  2. 费曼学习法：让学生用自己的话解释概念，发现理解漏洞
+  3. 错题必须进 Anki：错误率 <70% 的考点记录到 docs/guide/弱项追踪.md
+  4. 交错练习：混合不同科目/题型，避免单一重复
+  5. 间隔重复：配合 Anki FSRS 调度复习
+  6. B站课程字幕整理成 VitePress 笔记（见 AGENTS.md 规范）
+
+# 工具配置
+tools:
+  enabled:
+    - mcp__anki__*      # Anki 错题本
+    - mcp__bilibili__*  # B站课程字幕
+    - mcp__cloakbrowser__*  # 浏览器搜索（不用百度）
+    - mcp__code_runner__*   # C/Python 沙盒练习
+    - study-coach        # 学习教练技能
+    - github-repo-verification  # 仓库核实技能
+
+# 权限
+permissions:
+  mode: auto            # 学习场景下自动执行常见操作
+  deny:
+    - "Bash(git push --force*)"
+
+# 浏览器策略（写入优先级）
+browser:
+  priority:
+    - cloakbrowser      # ① 首选：反爬/验证页
+    - bsk               # ② 需登录态时（本机 Chrome）
+    - playwright-edge   # ③ 兜底
+  banned: ["baidu"]     # 不用百度搜索
+
+# 错题闭环
+mistake_tracking:
+  deck: "专升本::错题集"
+  weakness_threshold: 0.7
+  weakness_file: "docs/guide/弱项追踪.md"

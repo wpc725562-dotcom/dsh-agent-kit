@@ -1,0 +1,15 @@
+# MCP 服务器：cloakbrowser（浏览器自动化）
+# 安装：npm install -g @huiliyi37/dsh-mcp-client
+# 依赖：npx -y cloakbrowser-mcp@latest（首次运行自动下载）
+# 配置格式：dsh-mcp-client 的 cordis insert 块
+
+serverName: cloakbrowser
+transport: stdio
+command: '{NPX_CMD}'
+args:
+  - '-y'
+  - 'cloakbrowser-mcp@latest'
+env:
+  CLOAK_PLAYWRIGHT_MCP_NO_SANDBOX: 'true'
+toolCallTimeoutMs: 120000
+failOnStartupError: false

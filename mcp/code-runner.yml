@@ -1,0 +1,12 @@
+# MCP 服务器：code-runner（C / Python 沙盒执行）
+# 支持语言：C（gcc）、Python、JavaScript 等
+# 服务器：mcp-server-code-runner
+
+serverName: code-runner
+transport: stdio
+command: '{NPX_CMD}'
+args:
+  - '-y'
+  - 'mcp-server-code-runner'
+toolCallTimeoutMs: 120000
+failOnStartupError: false

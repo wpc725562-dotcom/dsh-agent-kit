@@ -1,0 +1,12 @@
+# MCP 服务器：bilibili（B站视频字幕 + 元数据 + 评论）
+# 前置条件：运行 npx -y @xzxzzx/bilibili-mcp@latest config 配置 Cookie
+# 服务器：@xzxzzx/bilibili-mcp
+
+serverName: bilibili
+transport: stdio
+command: '{NPX_CMD}'
+args:
+  - '-y'
+  - '@xzxzzx/bilibili-mcp'
+toolCallTimeoutMs: 120000
+failOnStartupError: false

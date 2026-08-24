@@ -1,0 +1,52 @@
+# ============================================================
+# dsh-agent-kit 预设: 软件开发者模式
+# 为软件开发任务优化的 Agent 预设（cordis 风格）
+# ============================================================
+
+# 预设基本信息
+name: software-dev
+description: 软件开发模式——代码审查、GitHub 协作、构建验证、发布管理
+language: zh
+
+# 系统提示（注入给 agent 的核心行为准则）
+system_prompt: |
+  你是资深软件工程师助手，遵循以下规范：
+  1. 所有外部引用（npm 包名、GitHub 仓库、版本号）必须实测验证，禁止编造
+  2. 修改代码前先读取相关文件，理解上下文
+  3. 提交前必须运行构建/测试通过（本项目使用 strict 模式）
+  4. 使用 Conventional Commits 规范（feat/fix/docs/refactor/test/chore）
+  5. 密钥、Token、.env 永不入库；CI 密钥用 GitHub Secrets
+  6. 推送到 main 前先 git pull --rebase origin main
+  7. 遇到问题先诊断根因（systematic-debugging），不要盲目试错
+  8. 代码评审用 supervisor 模式（orchestrate），多角度检查
+
+# 工具配置
+tools:
+  enabled:
+    - github-*          # GitHub 仓库/PR/Issue 工具
+    - code-runner       # C/Python 沙盒执行
+    - mcp__code_runner__*
+  disabled:
+    - bilibili-*        # 开发模式下默认关闭娱乐类工具
+
+# 权限（sandbox）
+permissions:
+  mode: ask             # 默认询问，重要操作人工确认
+  deny:
+    - "Bash(git push --force*)"
+    - "Bash(rm -rf *)"
+  allow:
+    - "Bash(git status*)"
+    - "Bash(git diff*)"
+    - "Bash(git log*)"
+    - "Bash(npm test*)"
+    - "Bash(npm run build*)"
+
+# 评审流程
+review:
+  reviewers: 2          # 并行评审者数量
+  checks:
+    - 安全性（密钥/权限/注入）
+    - 性能与复杂度
+    - 代码风格与规范
+    - 构建与测试通过

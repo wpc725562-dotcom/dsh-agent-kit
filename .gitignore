@@ -1,0 +1,51 @@
+# ---- 密钥与环境变量（禁止入库）----
+.env
+*.env
+.env.*
+!.env.example
+
+# ---- Node ----
+node_modules/
+dist/
+build/
+*.log
+npm-debug.log*
+
+# ---- Python ----
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# ---- IDE / 编辑器 ----
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# ---- Windows / 系统 ----
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+*.bak
+*.bak-*
+
+# ---- 本地 DSH 运行痕迹 ----
+state.json
+install-id*
+database.db*
+*.lock
+
+# ---- 临时文件 ----
+tmp/
+temp/
+*.tmp
+
+# ---- 技能缓存与中间产物 ----
+__pycache__/
+*.pyc
+.eval_results.json
+*.log

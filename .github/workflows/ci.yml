@@ -1,0 +1,49 @@
+name: CI — 语法校验
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  verify:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 校验 YAML 语法
+        shell: pwsh
+        run: |
+          $errors = 0
+          Get-ChildItem mcp/*.yml | ForEach-Object {
+            try { ConvertFrom-Yaml (Get-Content $_ -Raw) -ErrorAction Stop; Write-Host "✅ $_" }
+            catch { Write-Host "❌ $_ : $_"; $errors++ }
+          }
+          if ($errors -gt 0) { exit 1 }
+
+      - name: 校验 Skill 目录
+        shell: pwsh
+        run: |
+          $errors = 0
+          Get-ChildItem skills -Directory | ForEach-Object {
+            $skillFile = Join-Path $_.FullName "SKILL.md"
+            if (-not (Test-Path $skillFile)) {
+              Write-Host "❌ $($_.Name) 缺少 SKILL.md"; $errors++
+            } else {
+              $content = Get-Content $skillFile -Raw
+              if ($content -notmatch '^---\s*\n') {
+                Write-Host "❌ $($_.Name)/SKILL.md 缺少 frontmatter"; $errors++
+              } else {
+                Write-Host "✅ $($_.Name)/SKILL.md"
+              }
+            }
+          }
+          if ($errors -gt 0) { exit 1 }
+
+      - name: 检查无密钥泄露
+        shell: pwsh
+        run: |
+          $leaks = Select-String -Path "mcp/*.yml","presets/*.yml","scripts/*.ps1" -Pattern "sk-[a-zA-Z0-9]{20,}|apiKey:" -SimpleMatch
+          if ($leaks) { Write-Host "❌ 发现疑似密钥泄露!"; $leaks | Format-Table; exit 1 }
+          else { Write-Host "✅ 无密钥泄露" }
