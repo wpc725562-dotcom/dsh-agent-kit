@@ -34,6 +34,25 @@
 4. **禁止 push 到 main 前不拉取** —— 先 `git pull --rebase origin main`
 5. **禁止编造 BV 号 / npm 包名 / 仓库名**——所有外部引用必须实测核实
 
+## 已知坑点（实测验证，勿重蹈）
+
+### api.b.ai 网关路径（重要！）
+- api.b.ai **只允许推理路径**：`/v1/chat/completions`、`/v1/messages`、`/v1/responses`、`/v1/models`、`/v1/images/*`
+- 请求裸 `/v1` 会返回 **HTTP 403**：
+  `{"message":"HTTP node only allows access to inference API paths (...)", "success":false}`
+- **配置 provider 时必须写完整路径**：
+  - ✅ `base_url = "https://api.b.ai/v1"` + `request_url = "https://api.b.ai/v1/chat/completions"`
+  - ❌ `request_url = "https://api.b.ai/v1"`（裸路径，403）
+- 验证命令：`curl -X POST https://api.b.ai/v1/chat/completions -H "Authorization: Bearer $KEY" -d '{"model":"deepseek-v4-flash","messages":[{"role":"user","content":"hi"}]}'`
+
+### PowerShell 5.1 中文脚本
+- `.ps1` 含中文必须 **UTF-8 BOM**，否则解析为 GBK 报"字符串缺少终止符"
+- 正则 `{20,}` 在 PS 5.1 字符串中解析崩溃 → 用 `{20}` 或避免花括号量词
+
+### MCP 首次启动
+- npx 首次运行下载包较慢（120s 超时属正常）
+- anki-mcp-server 仅在 Anki 运行时注册工具；bilibili-mcp 需先 `config` 配 Cookie
+
 ## Git 规范
 
 - commit 格式：Conventional Commits（`feat:` / `fix:` / `docs:` / `chore:`）
