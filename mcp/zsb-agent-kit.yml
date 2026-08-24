@@ -1,0 +1,7 @@
+﻿serverName: zsb-agent-kit
+transport: stdio
+command: 'python'
+args:
+  - 'C:\Users\Administrator\Desktop\deeepseek\zsb-agent-kit\server_mcp.py'
+toolCallTimeoutMs: 120000
+failOnStartupError: false
