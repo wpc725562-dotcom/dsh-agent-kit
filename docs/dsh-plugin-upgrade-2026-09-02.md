@@ -48,21 +48,23 @@
 
 ### 根因
 
-DSH 社区插件作者的 peerDependencies 声明了**稳定版范围**（如 `@deepseek-ai/dsh-tools@>=0.1.2 <0.2.0-0`），但 DSH 官方只发布了 **rc/alpha 版本**（如 `0.0.1-rc.1`、`0.1.1-rc.2`）。
+DSH 社区插件作者的 peerDependencies 声明了**稳定版范围**（如 `@deepseek-ai/dsh-tools@>=0.1.2 <0.2.0-0`），但 DSH 官方只发布了 **rc/alpha 版本**（如 `0.0.1-rc.1`、`0.1.1-rc.2`、`0.1.2-alpha.4`）。
 
-semver 规则下 `0.1.1-rc.2 < 0.1.1`，因此 npm 上**不存在任何满足稳定版范围的版本**。
+semver 规则下 `0.1.1-rc.2 < 0.1.1`，因此 npm 上**不存在任何满足稳定版范围的版本**。且 pnpm 在解析 peer 交集时会**自动把 rc 范围转成稳定版范围**，导致即使插件声明 `^0.1.0-rc.8` 也会被取交集为 `>=0.1.1` 甚至 `>=0.1.2`。
 
-### 具体表现
+### 已验证的尝试（2026-09-02 实机实验）
 
-| 尝试 | 结果 | 原因 |
+| 尝试 | 结果 | 说明 |
 |------|------|------|
-| `pnpm update` 升级 7 个已装插件 | ❌ 失败 | 新版本要求 `@deepseek-ai/dsh-settings@>=0.1.1` |
-| `dsh plugin add` 安装 dsh-mcp-panel | ❌ 失败 | 要求 `@deepseek-ai/dsh-tools@>=0.1.2` |
-| 安装任何新 cordis-plugin | ❌ 预期失败 | 所有社区插件都踩同样的坑 |
+| `pnpm update` 升级 7 个已装插件 | ❌ | 新版本要求稳定版核心包 |
+| `dsh plugin add github:PerryLink/dsh-mcp-panel` | ❌ | 该插件明确面向 DSH 0.1.2-alpha.3（dshWorkshop.compatibility.dshVersions） |
+| `dsh plugin add dsh-better-sidebar` | ❌ | peer 是 rc 范围，但 pnpm 取交集后仍要稳定版 |
+| `pnpm.overrides` 强制核心包到 rc.2 | ❌ | pnpm 仍从 npm 按稳定版范围查找 |
+| 手动注册插件到 bundles | ❌ | DSH bundle 解析依赖 pnpm 模块解析，手动注册无法解析 |
 
-### 什么时候能解决
+### 结论
 
-等 DSH 官方发布核心包的稳定版（>=0.1.1）或社区插件改用 rc 范围。这是 DSH 生态的早期阶段阵痛。
+**在 DSH 官方发布稳定版核心包（>=0.1.1）之前，当前环境无法安装/升级任何 cordis-plugin。** 这不是配置问题，而是 DSH 生态早期阶段的全局约束。
 
 ---
 
@@ -107,6 +109,8 @@ semver 规则下 `0.1.1-rc.2 < 0.1.1`，因此 npm 上**不存在任何满足稳
 
 配置位置：`~/.dsh/profiles/desktop/cordis.patch.yml`
 
+**MCP 不依赖插件安装，可随时新增**——直接在 cordis.patch.yml 的 insert 列表加条目即可。这是当前环境下唯一不受版本锁定影响的扩展方式。
+
 ---
 
 ## 六、市场缓存刷新
@@ -140,22 +144,13 @@ allowBuilds:
 
 ---
 
-## 八、依赖树修复记录
+## 八、重要教训（勿犯）
 
-每次 `pnpm update` 或 `dsh plugin add` 失败，pnpm 都会把已装插件移到 `node_modules/.ignored`。恢复命令：
-
-```bash
-cd ~/.dsh/profiles/desktop/node_modules
-for p in dsh-at-file dsh-bookmarks dsh-context dsh-cost-meter dsh-github-intelligence dsh-ha-orchestrator dsh-plugin-bridge dsh-pocket dsh-popout-sidebar dshmarket; do
-  [ -d ".ignored/$p" ] && mv ".ignored/$p" "./$p"
-done
-for sc in @huiliyi37 @liustack @nanmicoder @openviking; do
-  [ -d ".ignored/$sc" ] && { mkdir -p "$sc"; for sub in .ignored/$sc/*; do [ -d "$sub" ] && mv "$sub" "$sc/"; done; }
-done
-rm -rf .ignored
-```
+1. **不要对 `~/.dsh/profiles/desktop` 执行 `pnpm update` / `pnpm install`**——失败时 pnpm 会把已装插件移到 `node_modules/.ignored`，且删除 `pnpm-lock.yaml` 会导致 DSH bundle 解析失败。
+2. **`pnpm-lock.yaml` 可从 `node_modules/.pnpm/lock.yaml` 恢复**（如果误删）。
+3. **MCP 扩展（cordis.patch.yml insert）不受版本锁定影响**，是当前唯一安全的扩展通道。
 
 ---
 
-*本报告由 Reasonix 自动生成，数据来源：DSH 本地市场缓存 + GitHub 实时搜索 + 实际安装验证*
+*本报告由 Reasonix 自动生成，数据来源：DSH 本地市场缓存 + GitHub 实时搜索 + 实机安装验证*
 *最后更新：2026-09-02*
